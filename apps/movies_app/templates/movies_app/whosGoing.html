@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>People Going</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        {% load staticfiles %}
+        <link type="text/css" rel="stylesheet" href="{% static 'movies_app/css/materialize.css' %}"  media="screen,projection"/>
+        <style>
+            .navbar-fixed {
+                z-index: 999;
+            }
+            img#logo{
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navbar-fixed">
+            <nav role="navigation" class="grey">
+                <div class="nav-wrapper container">
+                    <a id="logo-container" class="brand-logo">
+                        <img src="{% static 'movies_app/images/ffLogo.png' %}" alt="logo" id="logo" height="50"> 
+                    </a>
+
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="/moviesAttending"><span class="sub-important">Movies Attending</span></a></li>
+                        <li><a href="/logout"><span class="sub-important">Logout</span></a></li>
+                    </ul>
+
+                    <ul id="nav-mobile" class="side-nav">
+                        <li><a class="/moviesAttending"><span class="sub-important">Movies Attending</span></a></li>
+                        <li><a class="/logout"><span class="sub-important">Logout</span></a></li>
+                    </ul>
+                    <a href="#" data-activates="nav-mobile" class="button-collapse right"><i class="material-icons">menu</i></a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="container center">
+            <h3>Here's all the people going to {{ movie.title }}!</h3>
+            <hr>
+            <br>
+            <table class="responsive-table highlight">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="{% static 'movies_app/js/materialize.min.js' %}"></script>
+        <script>
+            $('.button-collapse').sideNav({
+                draggable: true,
+                closeOnClick: true
+            });
+        </script>
+    </body>
+</html>

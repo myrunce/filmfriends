@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Film Friends Welcome</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        {% load staticfiles %}
+        <link type="text/css" rel="stylesheet" href="{% static 'movies_app/css/materialize.css' %}"  media="screen,projection"/>
+        <style>
+            #searchAgain{
+                margin-top: 10px;
+                margin-left: 10px;
+                position: fixed;
+            }
+            .navbar-fixed {
+                z-index: 999;
+            }
+            img#logo{
+                margin-top: 5px;
+            }
+            .parallax-container {
+                height: 150px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="navbar-fixed">
+            <nav role="navigation" class="grey">
+                <div class="nav-wrapper container">
+                    <a id="logo-container" class="brand-logo">
+                        <img src="{% static 'movies_app/images/ffLogo.png' %}" alt="logo" id="logo" height="50"> 
+                    </a>
+
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="/welcome"><span class="sub-important">home</span></a></li>
+                        <li><a href="/moviesAttending"><span class="sub-important">Movies Attending</span></a></li>
+                        <li><a href="/logout"><span class="sub-important">Logout</span></a></li>
+                    </ul>
+
+                    <ul id="nav-mobile" class="side-nav">
+                        <li><a href="/welcome"><span class="sub-important">home</span></a></li>
+                        <li><a class="/moviesAttending"><span class="sub-important">Movies Attending</span></a></li>
+                        <li><a class="/logout"><span class="sub-important">Logout</span></a></li>
+                    </ul>
+                    <a href="#" data-activates="nav-mobile" class="button-collapse right"><i class="material-icons">menu</i></a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="parallax-container">
+            <div class="parallax"><img src="{% static 'movies_app/images/popcorn.png' %}"></div>
+        </div>
+
+        <button class="btn red pulse" id="searchAgain">search Again!</button>
+
+        <div class="container" id="lookMovies">
+            <h3 class="center">Hey {{ the_user.username }}!</h3>
+            <h3 class="center">Start looking for movies now!</h3>
+            <form id="searchForm">
+                {% csrf_token %}
+                Zipcode: <input type="text" name="zip"><br>
+                Date to watch: <input type="date" name="date"><br>
+                <div class="center">
+                    <input type="submit" value="Look for movies!" class="btn red" id="searchMov">
+                </div>
+            </form>
+            <br>
+        </div>
+
+        <div class="container" id="searchResults">
+            <h3 class="center">Movies available to you</h3>
+            <hr>
+            <br>
+            <div class="row" id="movieResults"> 
+            </div>
+        </div>
+
+        <div class="parallax-container">
+            <div class="parallax"><img src="{% static 'movies_app/images/popcorn.png' %}"></div>
+        </div>
+    
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="{% static 'movies_app/js/materialize.min.js' %}"></script>
+        <script>
+            $('#searchAgain').hide();
+            $('#searchResults').hide();
+            $('#searchForm').submit(function(){
+                var formData = $(this).serialize()
+                console.log(formData);
+                $.ajax({
+                    url: '/look',
+                    method:'post',
+                    data: formData,
+                    success: function(res){
+                        let result = JSON.parse(res);
+                        let api_key = 'sszbbjhadk82fc9nh469bs2k';
+                        let imgUrl = "http://developer.tmsimg.com/";
+                        $('#lookMovies').hide();
+                        $('#searchAgain').show();
+                        $('#searchResults').show();
+                        console.log(result);
+                        for (let i = 0; i < result.length; i++){
+                            let title = result[i].title.toString();
+                            let newTitle = "";
+                            for (let j = 0; j < title.length; j++){
+                                if (title[j] == "/"){
+                                    newTitle = title.split('/').join('_');
+                                }
+                                else{
+                                    newTitle = title.split(' ').join('_');
+                                }
+                            }
+                            let the_theatre = result[0].showtimes[0].theatre.name.toString();
+                            let theatre = the_theatre.split(' ').join('_');
+                            let html = '<div class="col m4 s6 center" id="a_movie">';
+                            html += '<img class= "responsive-img" src = "' + imgUrl + result[i].preferredImage.uri +'?api_key='+api_key+'" onerror="this.onerror=null;this.src="http://i.imgur.com/vkTeC5m.png";">'
+                            html += '<br>';
+                            html += '<p>' + result[i].title + '</p>'
+                            html += '<p>' + result[0].showtimes[0].theatre.name + '</p>'
+                            html +=  '<a href="/add/'+ result[i].rootId + '/' + newTitle + '/' + theatre + '"> Go to this movie! </a>'
+                            html += '</div>'
+                            $('#movieResults').prepend(html);
+                        }
+                    }
+                })
+                return false;
+            })
+            $('#searchAgain').click(function(){
+                $('#lookMovies').show();
+                $('#movieResults').html('');
+                $('#searchAgain').hide()
+                $('#searchResults').hide();
+            })
+
+            $('.button-collapse').sideNav({
+                draggable: true,
+                closeOnClick: true
+            });
+
+            $('.parallax').parallax();
+        </script>
+    </body>
+</html>

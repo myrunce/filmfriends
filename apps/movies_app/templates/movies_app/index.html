@@ -1,0 +1,164 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        {% load staticfiles %}
+        <link type="text/css" rel="stylesheet" href="{% static 'movies_app/css/materialize.css' %}"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Welcome to Movies</title>
+        <style>
+            .parallax-container {
+                height: 200px;
+            }
+            div.card-content.white-text.register{
+                width: 290px;
+                height: 350px;
+                overflow: scroll;
+            }
+            .navbar-fixed {
+                z-index: 999;
+            }
+            img#logo{
+                margin-top: 5px;
+            }
+        </style>   
+    </head>
+    <body>
+
+        <div class="navbar-fixed">
+            <nav role="navigation" class="grey">
+                <div class="nav-wrapper container">
+                    <a id="logo-container" class="brand-logo">
+                        <img src="{% static 'movies_app/images/ffLogo.png' %}" alt="logo" id="logo" height="50"> 
+                    </a>
+                    <ul class="right hide-on-med-and-down">
+                        <li><a class="about"><span class="sub-important">About</span></a></li>
+                    </ul>
+
+                    <ul id="nav-mobile" class="side-nav">
+                        <li><a class="about"><span class="sub-important">About</span></a></li>
+                    </ul>
+                    <a href="#" data-activates="nav-mobile" class="button-collapse right"><i class="material-icons">menu</i></a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="parallax-container">
+            <div class="parallax"><img src="{% static 'movies_app/images/selection.png' %}"></div>
+        </div>
+
+        <div class="container center">
+            {% for message in messages %}
+                <div class="messages">
+                    <h5 class="red-text">{{ message }}</h5>
+                </div>
+            {% endfor %}
+            <h1 class="center black-text">Watch Movies. Make Friends.</h1>
+            <h3 class="center black-text"><span class="red-text">F</span>ilm<span class="red-text">F</span>riends<span class="red-text">.</span></h3>
+            <button class="btn red" id="login_btn">Login</button> <button class="btn red" id="register_btn">Register</button><br>
+            <div class="container" id="login_form">
+                <form action="/login" method="post">
+                {% csrf_token %}
+                    <div class="input-field">
+                        <input id="email" type="email" class="validate" name="email">
+                        <label for="email" class="active">Email</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="password" type="password" class="validate" name="password">
+                        <label for="password" class="active">Password</label><br><br>
+                    </div>
+                    <div class="input-field">
+                        <div class="center">
+                            <button class="btn btn-large red" type="submit">Login</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="container" id="reg_form">
+                <form action="/process" method="post">
+                    {% csrf_token %}
+                    <div class="input-field">
+                        <input id="name" type="text" class="validate" name="name">
+                        <label for="name" class="active">Name</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="username" type="text" class="validate" name="username">
+                        <label for="username" class="active">Username</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="email" type="email" class="validate" name="email">
+                        <label for="email" class="active">Email</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="password" type="password" class="validate" name="password">
+                        <label for="password" class="active">Password</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="confirm_password" type="password" class="validate" name="confirm_password">
+                        <label for="confirm_password" class="active">Confirm Password</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="birthday" type="date" class="validate" name="birth">
+                        <label for="birthday" class="active">Birthday</label>
+                    </div>
+                    <div class="input-field">
+                        <input id="zipcode" type="text" class="validate" name="zipCode">
+                        <label for="zipcode" class="active">Zip Code</label>
+                    </div>
+                    <div class="center">
+                        <div class="input-field">
+                            <button class="btn btn-large red" type="submit">Register</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <br> 
+        </div>
+
+        <div class="parallax-container">
+            <div class="parallax"><img src="{% static 'movies_app/images/popcorn.png' %}"></div>
+        </div>
+
+        <div class="container center" id="about_section">
+            <h3>About</h3>
+            <h5 class="flow-text">Film Friends is an app that allows you to find people to watch movies with! All you need to is find the movie you want to watch, and you'll be added to a group of people that will watch the movie with you!</h5>
+            <br><br>
+        </div>
+
+        <div class="parallax-container">
+            <div class="parallax"><img src="{% static 'movies_app/images/movieBg.jpg' %}"></div>
+        </div>
+
+        <footer class="page-footer grey center">
+            <p>Created by Myron Navarrete using Python, Django, Sqlite, and Materialize</p>
+            <br>
+        </footer>
+            
+            
+        <script src= 'http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+        <script type="text/javascript" src="{% static 'movies_app/js/materialize.min.js' %}"></script>
+        <script>
+            $('.parallax').parallax();
+            $('#login_form').hide();
+            $('#reg_form').hide()
+            $('#login_btn').click(function(){
+                $('#login_form').slideToggle();
+            })
+            $('#register_btn').click(function(){
+                $('#reg_form').slideToggle();
+            })
+            $('.button-collapse').sideNav({
+                draggable: true,
+                closeOnClick: true
+            });
+            var NAVBAR_HEIGHT = 64;
+
+            $('.about').click(function() {
+                $('html, body').animate({
+                    scrollTop: $('#about_section').offset().top - NAVBAR_HEIGHT
+                    }, 'slow');
+            });
+        </script> 
+    </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>movie</title>
+      <script src= 'http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+      <!-- Bootstrap Core CSS -->
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'movies_app/css/stylesheet.css' %}">
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script>
+      var api_key = 'sszbbjhadk82fc9nh469bs2k';
+      var baseUrl = "http://data.tmsapi.com/v1.1";
+      var base_img_url = "http://developer.tmsimg.com/";
+      var showtimesUrl = baseUrl + '/movies/'+ {{movie_id}} +'/showings';
+      var zipCode = {{current}};
+      var d = new Date();//{{request.session.date}};  //i need this to be in a session storing the data from the date field
+      var today = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+      $(document).ready(function(){
+        $.ajax({
+          url: showtimesUrl,
+            data: { startDate: today,
+              zip: zipCode,
+              jsonp: "dataHandler",
+              api_key: api_key
+              },
+            dataType: "jsonp",
+          });
+        });
+        function dataHandler(data) {
+          $('.poster').text('').append(
+            $(document.createElement('img')).attr(
+              'src', base_img_url + data[0].preferredImage.uri + '?api_key='+api_key
+            )
+          )
+          $('.desc').append(
+            $(document.createElement('p')).text(
+              data[0].shortDescription
+            )
+          )
+          $('.rating').append(
+            $(document.createElement('h1')).text(
+              data[0].ratings[0].code
+            )
+          );
+          let showtime = $('.showtimes');
+          $.each(data, function(index, movie){
+            for (var i = 0; i < movie.showtimes.length; i++) {
+
+              let showing = $(document.createElement('p'));
+              showing.attr('class', 'showing')
+              showing.attr('x-showtime', movie.showtimes[i].dateTime);
+              showing.attr('x-movieid', {{movie_id}});
+              showing.text(movie.showtimes[i].dateTime);
+
+              $('.showtimes').append(showing)
+            }
+          })
+        }
+
+        $(document).on('click', '.showing', function(e){
+          e.preventDefault();
+          let me = $(this);
+          let movieid = me.attr('x-movieid');
+          let showtime = me.attr('x-showtime');
+          let csrftoken = $('#csrfcontainer input').attr('value')
+
+          $.post(
+            '/watch/' + movieid,
+            {
+              showtime:showtime,
+              csrfmiddlewaretoken:csrftoken,
+            },
+            function(response){
+              let congrats = 'Congratulations on picking ' +
+                  response.showtime + '! '
+              if (response.watcher_count === 1) {
+                congrats += " You are going alone.  It's dangerous to go alone invite a friend!"
+              } else {
+                congrats += response.watcher_count + ' people are going with you.' + ' tell more friends to find this movie!';
+              }
+
+              $('.showtimes').empty().append(
+                $(document.createElement('p')).text(
+                  congrats
+                )
+              );
+              console.log(response)
+            }
+          )
+        })
+  </script>
+<style>
+    h1,h2 {
+            text-align:center;
+            font-size: 300%;
+        /*  text-transform: uppercase;*/
+            letter-spacing: 1%;
+            margin:5% 0 0 0;
+            color: #bfa3a1;
+        }
+
+    p{
+      text-align: center;
+      color: white;
+      font-size: 20px;
+    }
+
+
+    input[type="submit"]{
+      margin: 20px;
+      display: inline-block;
+      color: blue;
+      vertical-align: top;
+      text-decoration: none;
+    }
+
+    form.shows{
+      display: inline-block;
+      margin-left: 10px;
+    }
+
+  </style>
+  </head>
+  <body>
+
+
+<div class="wrapper" id= 'selection'>
+    <h2 class="subhead">Your Selection</h2>
+    <hr>
+    <!-- <p>{{movie_id}}</p> -->
+    <div class="poster">
+    </div>
+    <div class="rating">
+
+    </div>
+    <div class="desc">
+
+    </div>
+    <div class="showtimes" id= "time">
+
+    </div>
+    <div id="csrfcontainer">
+      {%csrf_token%}
+    </div>
+  </div>
+  </body>
+</html>
